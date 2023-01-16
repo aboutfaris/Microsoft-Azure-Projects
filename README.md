@@ -25,14 +25,18 @@ Welcome back! This tutorial outlines the implementation of on-premises Active Di
 - Create X-Amount of Client Users using PowerShell Script
 
 <h2>Setup Resources in Azure</h2>
--1. Create the Domain Controller VM (Windows Server 2022) named “DC-1"
+-1 Create the Domain Controller VM (Windows Server 2022) named “DC-1"
    Take note of the Resource Group and Virtual Network (Vnet) that get created at this time
--2. Set Domain Controller’s NIC Private IP address to be static
+-2 Set Domain Controller’s NIC Private IP address to be static
 DC-1 > Networking > NIC > IP Configurations
+
 ![vivaldi_zDAEQAVoDh](https://user-images.githubusercontent.com/109401839/212756392-d05a4c3b-610c-4fe8-a5e8-1e31e86da7e3.png)
--3. Create the Client VM (Windows 10) named “Client-1”. Use the same Resource Group and Vnet that was created in the DC-1 step.
+
+-3 Create the Client VM (Windows 10) named “Client-1”. Use the same Resource Group and Vnet that was created in the DC-1 step.
 -4. Ensure that both VMs are in the same Vnet (you can check the topology with Network Watcher)
-Here is an illustration of what we are doing: ![vivaldi_QbUpS9XsXc](https://user-images.githubusercontent.com/109401839/212757249-70c7c150-9627-408f-a285-53b0f9d34a09.png)
+Here is an illustration of what we are doing: 
+
+![vivaldi_QbUpS9XsXc](https://user-images.githubusercontent.com/109401839/212757249-70c7c150-9627-408f-a285-53b0f9d34a09.png)
 
 <h2>Ensure Connection between Client and Domain Controller<h2>
 -1. Login to Client-1 with Remote Desktop and ping DC-1’s private IP address with ping -t <ip address> (perpetual ping)
