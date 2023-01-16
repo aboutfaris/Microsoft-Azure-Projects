@@ -3,6 +3,7 @@
 </p>
 
 <h1>On-premises Active Directory Deployed in the Cloud (Azure)</h1>
+
 Welcome back! This tutorial outlines the implementation of on-premises Active Directory within Azure Virtual Machines.<br />
 
 <h2>Environments and Technologies Used</h2>
@@ -25,6 +26,7 @@ Welcome back! This tutorial outlines the implementation of on-premises Active Di
 - Create X-Amount of Client Users using PowerShell Script
 
 <h2>Setup Resources in Azure</h2>
+
 1. **Create the Domain Controller VM (Windows Server 2022) named “DC-1"**
    Take note of the Resource Group and Virtual Network (Vnet) that get created at this time
 2. **Set Domain Controller’s NIC Private IP address to be static**
@@ -38,12 +40,14 @@ Here is an illustration of what we are doing:
 
 ![vivaldi_QbUpS9XsXc](https://user-images.githubusercontent.com/109401839/212757249-70c7c150-9627-408f-a285-53b0f9d34a09.png)
 
-<h2>Ensure Connection between Client and Domain Controller<h2>**
+<h2>Ensure Connection between Client and Domain Controller<h2>
+
 1. **Login to Client-1 with Remote Desktop and ping DC-1’s private IP address with ping -t <ip address> (perpetual ping)**
 2. **Login to the Domain Controller and enable ICMPv4 in on the local windows Firewall**
 3. **Check back at Client-1 to see the ping succeed**
 
 <h2>Install Active Directory<h2>
+
 1. **Login to DC-1 and install Active Directory Domain Services**
 2. **Promote as a DC: Setup a new forest as mydomain.com (can be anything, just remember what it is)**
 3. **Restart and then log back into DC-1 as user: mydomain.com\labuser**
@@ -55,6 +59,7 @@ Here is an illustration of what we are doing:
 9. **User jane_admin as your admin account from now on**
 
 <h2>Join Client-1 to your domain (mydomain.com)<h2>
+
 1. **From the Azure Portal, set Client-1’s DNS settings to the DC’s Private IP address**
 2. **From the Azure Portal, restart Client-1**
 3. **Login to Client-1 (Remote Desktop) as the original local admin (labuser) and join it to the domain (computer will restart)**
