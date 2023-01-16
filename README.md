@@ -18,17 +18,34 @@ Welcome back! In this tutorial, we will build a solid fundamental understanding 
 - Active Directory Installed
 - Client and Domain Controller Connected
 
+![image](https://user-images.githubusercontent.com/109401839/212764385-ea1b8467-c408-4335-879e-2cf80147888c.png)
+
+What is DNS? The Domain Name System (DNS) is the phonebook of the Internet. It basically allows us to convert IP addresses from numbers (8.8.8.8) to readable addresses like (www.google.com). 
 <h2>Actions and Observations</h2>
+**A-Record Exercise**
 
-1. 
+1. **Connect/log into DC-1 as your domain admin account (mydomain.com\jane_admin)**
+2. **Connect/log into Client-1 as an admin (mydomain\jane_admin)**
+3. **From Client-1 try to ping “mainframe” notice that it fails**
+4. **Nslookup “mainframe” notice that it fails (no DNS record)**
+5. **Create a DNS A-record on DC-1 for “mainframe” and have it point to DC-1’s Private IP address
+> DNS Manager via Server Manager
+> Forward Lookup
+>Mydomain
+>manualltyy create A record with ip of dc**
+6. **Go back to Client-1 and try to ping it. Observe that it works**
 
-2.
+**Local DNS Cache Exercise**
 
-3. 
+1. **Go back to DC-1 and change mainframe’s record address to 8.8.8.8**
+2. **Go back to Client-1 and ping “mainframe” again. Observe that it still pings the old address
+> because still exist in client cache so pings old ip address.** 
+3. **Observe the local dns cache (ipconfig /displaydns)**
+4. **Flush the DNS cache (ipconfig /flushdns). Observe that the cache is empty**
+5. **Attempt to ping “mainframe” again. Observe the address of the new record is showing up**
 
-4. 
+**CNAME Record Exercise**
 
-5. 
-
-
-In the [next tutorial](https://github.com/fnabeel/Building-Intuition-for-DNS),  we will go over settingup DNS. You may keep the virtual machine from this lab and continue with the next tutorial. 
+1. **Go back to DC-1 and create a CNAME record that points the host “search” to “www.google.com”**
+2. **Go back to Client-1 and attempt to ping “search”, observe the results of the CNAME record**
+3. **On Client-1, nslookup “search”, observe the results of the CNAME record**
