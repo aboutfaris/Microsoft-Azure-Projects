@@ -20,7 +20,8 @@ Welcome back! In this tutorial, we will build a solid fundamental understanding 
 
 ![image](https://user-images.githubusercontent.com/109401839/212764385-ea1b8467-c408-4335-879e-2cf80147888c.png)
 
-What is DNS? The Domain Name System (DNS) is the phonebook of the Internet. It basically allows us to convert IP addresses from numbers (8.8.8.8) to readable addresses like (www.google.com). 
+What is DNS? The Domain Name System (DNS) is the phonebook of the Internet. It basically allows us to convert IP addresses from numbers (8.8.8.8) to readable addresses like (www.google.com). Imagine, when using your smartphone and we ask our built in assistant, "Hey Siri, call USPS nearby" and siri then finds that address, converts it to a number, and connects us to the USPS. 
+
 <h2>Actions and Observations</h2>
 **A-Record Exercise**
 
