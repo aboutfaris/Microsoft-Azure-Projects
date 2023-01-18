@@ -15,15 +15,18 @@ Welcome back! In this tutorial, We will create folders in DC-1 from the previous
 
 <h2>Actions and Observations</h2>
 
-**Create some sample file shares with various permissions**
+Create some sample file shares with various permissions
 
-1. **Connect/log into DC-1 as your domain admin account (mydomain.com\jane_admin)**
-2. **Connect/log into Client-1 as a normal user (mydomain\<someuser>)**
-3. **On DC-1, on the C:\ drive, create 4 folders: “read-access”, “write-access”, “no-access”, “accounting”**
-4. **Set the following permissions (share the folder) for the “Domain Users” group:**
-5. **Folder: “read-access”, Group: “Domain Users”, Permission: “Read”**
-6. **Folder: “write-access”, Group: “Domain Users”, Permissions: “Read/Write”**
-7. **Folder: “no-access”, Group: “Domain Admins”, “Permissions: “Read/Write”**
+1. Connect/log into DC-1 as your domain admin account (mydomain.com\jane_admin)
+2. Connect/log into Client-1 as a normal user (mydomain\<someuser>)
+3. On DC-1, on the C:\ drive, create 4 folders: “read-access”, “write-access”, “no-access”, “accounting”
+4. Set the following permissions (share the folder) for the “Domain Users” group:
+5. Folder: “read-access”, Group: “Domain Users”, Permission: “Read”
+6. Folder: “write-access”, Group: “Domain Users”, Permissions: “Read/Write”
+7. Folder: “no-access”, Group: “Domain Admins”, “Permissions: “Read/Write"
+
+![vivaldi_udC3XRiOew](https://user-images.githubusercontent.com/109401839/213168775-c3202790-fd5b-412a-9403-c2a34f312c38.png)
+
 8. **(Skip accounting for now)**
 
 **Attempt to access file shares as a normal user**
