@@ -136,13 +136,7 @@ Look at that beautiful traffic. Now its time to ...
 3. Create a new File and paste the contents of the [script] below:
 
 
-''' 
-
-# ----- Edit these Variables for your own Use Case ----- #
-$PASSWORD_FOR_USERS   = "Password1"
-$NUMBER_OF_ACCOUNTS_TO_CREATE = 10000
-# ------------------------------------------------------ #
-
+'''
 Function generate-random-name() {
     $consonants = @('b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z')
     $vowels = @('a','e','i','o','u','y')
