@@ -134,7 +134,11 @@ Look at that beautiful traffic. Now its time to ...
 1. Login to DC-1 as jane_admin
 2. Open PowerShell_ise as an administrator
 3. Create a new File and paste the contents of the [script] below:
-''' # ----- Edit these Variables for your own Use Case ----- #
+
+
+''' 
+
+# ----- Edit these Variables for your own Use Case ----- #
 $PASSWORD_FOR_USERS   = "Password1"
 $NUMBER_OF_ACCOUNTS_TO_CREATE = 10000
 # ------------------------------------------------------ #
@@ -179,7 +183,9 @@ while ($count -lt $NUMBER_OF_ACCOUNTS_TO_CREATE) {
                -Path "ou=_EMPLOYEES,$(([ADSI]`"").distinguishedName)" `
                -Enabled $true
     $count++
-}''' 
+}
+
+''' 
 
 [Code Source](https://github.com/joshmadakor1/AD_PS/blob/master/Generate-Names-Create-Users.ps1)
 
