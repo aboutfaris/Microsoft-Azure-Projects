@@ -53,6 +53,3 @@ Open WireShark and for ICMP Traffic only. This traffic will display the relay re
 5. Observe RDP Traffic, Filter for RDP. We can do this by entering "tcp.port == 3389" in WireShark. Traffic is now constantly flowing, showing a live stream of packets between one computer to another. Fascinating isnt it? 
 
 ![vivaldi_yi916o0Wbr](https://user-images.githubusercontent.com/109401839/213243903-af301b6a-d633-457e-ad1f-dc22cb93edf5.png)
-
-
-In the [next tutorial](https://github.com/fnabeel/Network-File-Shares-and-Permissions),  we will go over settingup Network File Sharing and Permissions. I recommend not destroying your virtual machine you have created in this tutorial. It will come in handy next time !
