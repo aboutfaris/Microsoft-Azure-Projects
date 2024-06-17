@@ -190,5 +190,3 @@ Look at that beautiful traffic. Now its time to ...
 
 ![vivaldi_hbfgkZ3l45](https://user-images.githubusercontent.com/109401839/213226577-6f5bd613-ba81-4a62-bc7c-98896e41c94a.png)
 
-
-Thats is it ! In the [next tutorial](https://github.com/fnabeel/-azure-network-protocols), we will go over various network traffic to and from Azure Virtual Machines with Wireshark as well as experiment with Network Security Groups.
