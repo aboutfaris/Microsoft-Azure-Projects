@@ -1,7 +1,8 @@
 ![image](https://user-images.githubusercontent.com/109401839/212763285-615193c5-a326-4fe5-8387-fa77727c3666.png)
 
-<h1>Network File Shares and Permissions</h1>
-Welcome back! In this tutorial, We will create folders in DC-1 from the previous Tutorial. <br />
+# Network File Shares and Permissions
+
+Welcome back! In this tutorial, we create folders in DC-1 from the previous tutorial.
 
 <h2>Environments and Technologies Used</h2>
 
@@ -69,4 +70,4 @@ Create some sample file shares with various permissions
 6. **On DC-1, make <someuser> a member of the “ACCOUNTANTS” Security Group**
 7. **Sign back into Client-1 as <someuser> and try to access the “accounting” share in \\DC-1\**
 
-In the [next tutorial](https://github.com/fnabeel/Building-Intuition-for-DNS),  we will go over settingup DNS. You may keep the virtual machine from this lab and continue with the next tutorial. 
+In the [next tutorial](https://github.com/aboutfaris/Building-Intuition-for-DNS), we go over setting up DNS. You may keep the virtual machine from this lab and continue with the next tutorial.
