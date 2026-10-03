@@ -1,55 +1,89 @@
-<p align="center">
-<img src="https://i.imgur.com/Ua7udoS.png" alt="Traffic Examination"/>
-</p>
+# Network Security Groups and Inspecting Traffic Between Azure VMs
 
-<h1>Network Security Groups (NSGs) and Inspecting Traffic Between Azure Virtual Machines</h1>
-Welcome back! In this tutorial, we observe various network traffic to and from Azure Virtual Machines with Wireshark as well as experiment with Network Security Groups. <br />
+Capture and read ICMP, SSH, DHCP, DNS, and RDP traffic between two Azure virtual machines with Wireshark. Each VM sits behind its own network security group (NSG), and the Windows VM watches the traffic it sends to and receives from the Linux VM.
 
-<h2>Environments and Technologies Used</h2>
+## What you'll use
 
-- Microsoft Azure (Virtual Machines/Compute)
+- Microsoft Azure (Virtual Machines/Compute) with network security groups
 - Remote Desktop
-- Various Command-Line Tools
-- Various Network Protocols (SSH, RDH, DNS, HTTP/S, ICMP)
-- Wireshark (Protocol Analyzer)
+- Command-line tools: PowerShell, `ping`, `ssh`, `ipconfig`, `nslookup`
+- Wireshark (protocol analyzer)
+- Windows 10 (21H2) and Ubuntu Server 20.04
 
-<h2>Operating Systems Used </h2>
+## Prerequisites
 
-- Windows 10 (21H2)
-- Ubuntu Server 20.04
+- An Azure subscription
 
-<h2>High-Level Steps</h2>
+## Steps
 
-- Observe ICMP Traffic
-- Observe SSH Traffic
-- Observe DHCP Traffic
-- Observe DNS Traffic
-- Observe RDP Traffic
+### Part 1: Set up the VMs
 
-<h2>Actions and Observations</h2>
+1. In Azure, create two VMs in the same resource group and virtual network, each with at least 2 vCPUs (4 is more comfortable):
+   - VM1: Windows 10 (21H2)
+   - VM2: Ubuntu Server 20.04
+2. Note the private IP of each VM from its Overview page (in this lab, the Windows VM was `10.0.0.4` and the Linux VM `10.0.0.5`).
+3. Connect to the Windows VM with Remote Desktop.
+4. On the Windows VM, download Wireshark from [wireshark.org/download](https://www.wireshark.org/download.html) (Windows Installer, 64-bit) and install it.
+5. Open Wireshark and start a capture on the Ethernet adapter.
 
-1. For this demonstration, we need to create two virtual machines using Microsoft Azure. One machine will use Ubuntu Linux, and the other will use Windows 10 as its operating system. Both should have a minimum of a two-core virtual CPU; personally, I went with four cores. Once both are set up, log in to the Windows 10 VM. Download and install [WireShark](https://www.wireshark.org/download.html).
+### Part 2: ICMP
 
-![2023-01-18 10 44 12 coursecareers com 8c7c0e9793bb](https://user-images.githubusercontent.com/109401839/213242045-9299d76b-2631-4b63-818f-3a74a8a9b3ab.jpg)
+6. In Wireshark, set the display filter to `icmp`.
+7. In PowerShell, ping the Linux VM:
 
+   ```powershell
+   ping <linux-vm-private-ip>
+   ```
 
-Open WireShark and filter for ICMP traffic only. This traffic displays the relay request and reply, also known as "ping". We can see how many packets are requested and received, and inspect the data of the packets in WireShark.
+   Expected result: PowerShell shows 4 replies and 0% loss. Wireshark lists alternating Echo (ping) request packets from the Windows VM and Echo (ping) reply packets from the Linux VM. Selecting one shows the Ethernet, IPv4, and ICMP layers and the payload bytes.
 
-![vivaldi_Z27HHIWElt](https://user-images.githubusercontent.com/109401839/213242732-517627c3-b557-40bc-906e-cce25ec02953.png)
+### Part 3: SSH
 
-2. Let's observe a different kind of traffic: SSH. Filter for SSH traffic only in WireShark. From the Windows 10 VM, SSH into the Ubuntu VM using the command `ssh username@ipaddress` (in my case, `ssh labuser@10.0.0.4`). WireShark will immediately show the SSH packets between the two VMs.
+8. Change the display filter to `ssh`.
+9. SSH from the Windows VM to the Linux VM:
 
-![vivaldi_voFaQKzigU](https://user-images.githubusercontent.com/109401839/213243011-f74fa2ba-ba3f-4c0f-938f-2915b998b68e.png)
+   ```powershell
+   ssh <username>@<linux-vm-private-ip>
+   ```
 
+10. Type `yes` to accept the host key fingerprint, then enter the password.
 
-3. Observe DHCP traffic. DHCP (Dynamic Host Configuration Protocol) operates on ports 67 and 68, and its main function is to assign IP addresses to devices. Filter for DHCP in WireShark. Issue a new IP address to the Windows 10 VM by running `ipconfig /renew` in CMD, then inspect WireShark for this traffic.
+    Expected result: Wireshark immediately shows SSHv2 packets between the two VMs: the client and server protocol banners (OpenSSH for Windows and OpenSSH on Ubuntu), Key Exchange Init, and Elliptic Curve Diffie-Hellman exchange, all to destination port 22.
 
-![vivaldi_2hRg2VDUxe](https://user-images.githubusercontent.com/109401839/213243361-2e338ef0-af7c-47b9-9387-6a002791fd07.png)
+### Part 4: DHCP
 
-4. Observe DNS traffic. Filter for DNS. In CMD, use `nslookup` to resolve a domain (such as google.com) to an IP address, then inspect the traffic WireShark captures.
+11. Change the display filter to `dhcp`. DHCP assigns IP addresses and uses UDP ports 67 and 68.
+12. In an administrator PowerShell, request a new lease:
 
-![vivaldi_p4LlxYiVLv](https://user-images.githubusercontent.com/109401839/213243701-b3915d44-2aa3-4fe7-b637-e7d9c5ecd6c3.png)
+    ```powershell
+    ipconfig /renew
+    ```
 
-5. Observe RDP traffic. Filter for RDP by entering `tcp.port == 3389` in WireShark. Traffic flows continuously, showing a live stream of packets between the two computers.
+    Expected result: Wireshark shows a DHCP Request from the Windows VM (source port 68, destination port 67) to the Azure host address `168.63.129.16` and a DHCP ACK back. `ipconfig` shows the same IPv4 address, subnet mask `255.255.255.0`, and the default gateway.
 
-![vivaldi_yi916o0Wbr](https://user-images.githubusercontent.com/109401839/213243903-af301b6a-d633-457e-ad1f-dc22cb93edf5.png)
+### Part 5: DNS
+
+13. Change the display filter to `dns`.
+14. Look up a domain:
+
+    ```powershell
+    nslookup www.google.com
+    ```
+
+    Expected result: `nslookup` answers through the Azure DNS server `168.63.129.16` with a non-authoritative IPv4 and IPv6 address. Wireshark shows the query and response pairs on UDP port 53.
+
+### Part 6: RDP
+
+15. Change the display filter to `tcp.port == 3389`.
+
+    Expected result: packets stream continuously between the Windows VM and your own computer's public IP, because your Remote Desktop session is live. Most are TLS Application Data with TCP ACKs on port 3389.
+
+## What I learned
+
+- Wireshark display filters isolate one protocol at a time: `icmp`, `ssh`, `dhcp`, `dns`, `tcp.port == 3389`.
+- Azure VMs reach DHCP and DNS through the platform address `168.63.129.16`.
+- An active RDP session generates constant traffic, so filter it out when capturing anything else.
+
+## Next steps / cleanup
+
+- Delete the resource group when you finish to stop charges.
