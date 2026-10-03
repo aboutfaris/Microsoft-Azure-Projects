@@ -1,192 +1,165 @@
-<p align="center">
-<img src="https://i.imgur.com/pU5A58S.png" alt="Microsoft Active Directory Logo"/>
-</p>
-
 # On-Premises Active Directory Deployed in the Cloud (Azure)
 
-Welcome back! This tutorial outlines the implementation of on-premises Active Directory within Azure Virtual Machines.
+Build a small Active Directory lab in Azure: a Windows Server domain controller (DC-1), a Windows 10 client (Client-1) joined to the domain, and a batch of test users created with a PowerShell script.
 
-<h2>Environments and Technologies Used</h2>
+## What you'll use
 
 - Microsoft Azure (Virtual Machines/Compute)
 - Remote Desktop
 - Active Directory Domain Services
-- PowerShell
+- PowerShell ISE
+- Windows Server 2022 (DC-1) and Windows 10 (21H2) (Client-1)
 
-<h2>Operating Systems Used </h2>
+## Prerequisites
 
-- Windows Server 2022
-- Windows 10 (21H2)
+- An Azure subscription where you can create virtual machines
 
-<h2>High-Level Deployment and Configuration Steps</h2>
+## Steps
 
-- Setup Resources In Azure
-- Ensure Connection between Client and Domain Controller
-- Install Active Directory and Admin Creation
-- Create X-Amount of Client Users using PowerShell Script
+### Part 1: Set up resources in Azure
 
-<h2>Setup Resources in Azure</h2>
+1. Create the domain controller VM (Windows Server 2022) named `DC-1`. Take note of the resource group and virtual network (VNet) created with it.
+2. Set DC-1's NIC private IP address to static: DC-1 > Networking > NIC > IP configurations > ipconfig1 > Assignment: Static, then Save.
 
-1. Create the Domain Controller VM (Windows Server 2022) named “DC-1"
-   Take note of the Resource Group and Virtual Network (Vnet) that get created at this time
-2. Set Domain Controller’s NIC Private IP address to be static
-DC-1 > Networking > NIC > IP Configurations
+   Expected result: ipconfig1 shows Assignment set to Static, with the private IP (for example 10.0.0.4) on the VNet's default subnet.
 
-![vivaldi_zDAEQAVoDh](https://user-images.githubusercontent.com/109401839/212756392-d05a4c3b-610c-4fe8-a5e8-1e31e86da7e3.png)
+3. Create the client VM (Windows 10) named `Client-1`, using the same resource group and VNet as DC-1.
+4. Make sure both VMs are in the same VNet. You can check the topology with Network Watcher.
 
-3. Create the Client VM (Windows 10) named “Client-1”. Use the same Resource Group and Vnet that was created in the DC-1 step.
-4. Ensure that both VMs are in the same Vnet [you can check the topology with Network Watcher]
-Here is an illustration of what we are doing: 
+   Expected result: the Virtual machines list shows Client-1 and DC-1 running in the same resource group and region. The plan: DC-1 keeps a static private IP, Client-1 uses that IP as its DNS server, and Client-1 joins the domain through DC-1.
 
-![vivaldi_z3kENJuYuV](https://user-images.githubusercontent.com/109401839/213212076-117f26c0-c06f-4bb0-871a-45a97f293acf.png)
+### Part 2: Check connectivity between Client-1 and DC-1
 
+5. Remote Desktop into Client-1 and start a continuous ping to DC-1's private IP:
 
-![vivaldi_QbUpS9XsXc](https://user-images.githubusercontent.com/109401839/212757249-70c7c150-9627-408f-a285-53b0f9d34a09.png)
+   ```cmd
+   ping -t <dc-1-private-ip>
+   ```
 
-<h2>Ensure Connection between Client and Domain Controller<h2>
+   Expected result: "Request timed out." DC-1's firewall blocks ICMP by default.
 
-1. Login to Client-1 with Remote Desktop and ping DC-1’s private IP address with ping -t <ip address> (perpetual ping)
+6. Leave the ping running. Remote Desktop into DC-1 and open Windows Defender Firewall with Advanced Security > Inbound Rules, then sort by Protocol.
+7. Enable both "Core Networking Diagnostics - ICMP Echo Request (ICMPv4-In)" rules (Private and Domain profiles): select each rule and click Enable Rule in the Actions pane.
+8. Go back to Client-1 and watch the ping.
 
-![vivaldi_3DGaaVQRmB](https://user-images.githubusercontent.com/109401839/213212386-519dc0bd-6913-49f1-b3e3-8bbb260741a5.png)
+   Expected result: the timeouts turn into "Reply from <dc-1-private-ip>: bytes=32 time=1ms TTL=128".
 
-Oh! Notice we are getting a "Request timed out." Let us fix that. 
+### Part 3: Install Active Directory
 
-2. Login to the Domain Controller and enable ICMPv4 in on the local windows Firewall, keep client-1 instance open. 
+9. On DC-1, open Server Manager > Add Roles and Features and check Active Directory Domain Services. Finish the wizard.
+10. Click the warning flag in Server Manager, then "Promote this server to a domain controller".
+11. In Deployment Configuration, choose "Add a new forest" and set the root domain name to `mydomain.com` (it can be anything, just remember it). Finish the wizard and let DC-1 restart.
+12. Log back in to DC-1 as `mydomain.com\labuser`.
 
-- Start Menu > Windows Defender Firewall with Advanced Secruity programme > Inbound Rules > Sort by Porotocol > 
+### Part 4: Create OUs and an admin account
 
-- Enable "Core Networking Diagnostics - ICMP Echo Request (ICMPv4-In) Private and Domain Profiles. 2 Inbound Rules.
+13. Open Active Directory Users and Computers (ADUC) from the Start menu.
+14. Right-click `mydomain.com` > New > Organizational Unit and create an OU named `_EMPLOYEES`.
+15. Create another OU named `_ADMINS`.
+16. In `_ADMINS`, right-click > New > User. Create "Jane Doe" with the username `jane_admin` (same password as labuser).
+17. Open Jane Doe's Properties > Member Of > Add..., type `domain`, click Check Names, and pick Domain Admins from Multiple Names Found. Click OK.
 
-![Inkedvivaldi_Gb9rFL8rhC](https://user-images.githubusercontent.com/109401839/213214025-94b0bfb0-f017-4e8b-8676-d01ffeb9ab93.jpg)
+    Expected result: the Member Of tab lists Domain Admins and Domain Users.
 
+18. Log out of DC-1 and log back in as `mydomain.com\jane_admin`. Use jane_admin as your admin account from now on.
 
-3. Check back at Client-1 to see the ping succeed
+### Part 5: Join Client-1 to the domain
 
-![vivaldi_WbtokOOBck](https://user-images.githubusercontent.com/109401839/213214146-018e77d5-98a4-4256-91fd-16647ff58006.png)
+19. In the Azure portal, set Client-1's DNS server to DC-1's private IP address.
+20. In the Azure portal, restart Client-1.
+21. Log in to Client-1 as the original local admin (`labuser`). Open System Properties > Change, set Member of > Domain to `mydomain.com`, and click OK. The computer restarts.
 
-Look at that beautiful traffic. Now its time to ... 
+    Tip: if the join fails, run `ipconfig /all` on Client-1. "DNS Servers" should show DC-1's private IP. If it still shows Azure's default DNS (168.63.129.16), the DNS change has not applied yet.
 
-<h2>Install Active Directory<h2>
+22. On DC-1, open ADUC and confirm Client-1 shows up in the Computers container at the root of the domain.
+23. Create a new OU named `_CLIENTS` and drag Client-1 into it.
 
+### Part 6: Allow Remote Desktop for non-admin users
 
+24. Log in to Client-1 as `mydomain.com\jane_admin` and open Settings > System > Remote Desktop. Make sure Enable Remote Desktop is On.
+25. Click "Select users that can remotely access this PC" > Add. With the location set to `mydomain.com`, enter `Domain Users`, click Check Names, then OK.
 
-1. Login to DC-1 and install Active Directory Domain Services
+    Expected result: normal, non-admin domain users can now Remote Desktop into Client-1. In production you'd do this with Group Policy so you can change many machines at once.
 
-- Server Manager > "Add Roles and Features" > Check "Active Directory Domain Services"
+### Part 7: Create users with PowerShell
 
-![vivaldi_od5BgUKG6G](https://user-images.githubusercontent.com/109401839/213214935-0fe230d0-60be-431a-bf31-53cfc50748b9.png)
+26. Log in to DC-1 as `jane_admin`.
+27. Open PowerShell ISE as an administrator.
+28. Create a new file and paste the script below. Set the two variables at the top first: the password every new user gets, and how many accounts to create (the lab run used 10000).
 
-2. Promote as a DC: Setup a new forest as mydomain.com (can be anything, just remember what it is)
+    ```powershell
+    # ----- Edit these Variables for your own Use Case ----- #
+    $PASSWORD_FOR_USERS   = "<choose-a-lab-password>"
+    $NUMBER_OF_ACCOUNTS_TO_CREATE = 10000
+    # ------------------------------------------------------ #
 
-![2023-01-18 09 37 20 coursecareers com a3928ff24e0f](https://user-images.githubusercontent.com/109401839/213215535-f43842d0-f1ab-4c6a-91d1-18d8a9bdff06.jpg)
+    Function generate-random-name() {
+        $consonants = @('b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z')
+        $vowels = @('a','e','i','o','u','y')
+        $nameLength = Get-Random -Minimum 3 -Maximum 7
+        $count = 0
+        $name = ""
 
-![2023-01-18 09 38 10 coursecareers com 78e39ae4181d](https://user-images.githubusercontent.com/109401839/213215738-c6379380-e5b8-438b-95a8-6906a16ff339.jpg)
+        while ($count -lt $nameLength) {
+            if ($($count % 2) -eq 0) {
+                $name += $consonants[$(Get-Random -Minimum 0 -Maximum $($consonants.Count - 1))]
+            }
+            else {
+                $name += $vowels[$(Get-Random -Minimum 0 -Maximum $($vowels.Count - 1))]
+            }
+            $count++
+        }
 
-3. Restart and then log back into DC-1 as user: mydomain.com\labuser
+        return $name
 
-![vivaldi_xJc36FTsPS](https://user-images.githubusercontent.com/109401839/213216324-dccbe8d1-3791-4eea-8609-6643d27f1bc9.png)
+    }
 
-![vivaldi_ADY0CCC3v8](https://user-images.githubusercontent.com/109401839/213217001-5c300c3f-f194-4df9-bb68-b4fb464e500c.png)
+    $count = 1
+    while ($count -lt $NUMBER_OF_ACCOUNTS_TO_CREATE) {
+        $fisrtName = generate-random-name
+        $lastName = generate-random-name
+        $username = $fisrtName + '.' + $lastName
+        $password = ConvertTo-SecureString $PASSWORD_FOR_USERS -AsPlainText -Force
 
-4. In Active Directory Users and Computers (ADUC), create an Organizational Unit (OU) called “_EMPLOYEES"
+        Write-Host "Creating user: $($username)" -BackgroundColor Black -ForegroundColor Cyan
 
-![Inkedvivaldi_YgN8JfZgEn](https://user-images.githubusercontent.com/109401839/213217570-765d4e0f-05dd-4985-b6e5-0ce1210d6338.jpg)
+        New-AdUser -AccountPassword $password `
+                   -GivenName $firstName `
+                   -Surname $lastName `
+                   -DisplayName $username `
+                   -Name $username `
+                   -EmployeeID $username `
+                   -PasswordNeverExpires $true `
+                   -Path "ou=_EMPLOYEES,$(([ADSI]`"").distinguishedName)" `
+                   -Enabled $true
+        $count++
+    }
+    ```
 
-5. Create a new OU named “_ADMINS"
+    Code source: [Generate-Names-Create-Users.ps1](https://github.com/joshmadakor1/AD_PS/blob/master/Generate-Names-Create-Users.ps1)
 
-![vivaldi_JXNeaUMVFe](https://user-images.githubusercontent.com/109401839/213218280-33c7fe97-751c-4ba8-8900-dd90821fc579.png)
+    Note: the script stores the first name in `$fisrtName` but passes `$firstName` to `-GivenName`, so the GivenName field stays blank. Usernames are not affected.
 
-6. Create a new employee named "Jane Doe" (same password) with the username "jane_admin"
-7. Add jane_admin to the “Domain Admins” Security Group
+29. Click Run Script (F5).
 
-![2023-01-18 09 46 52 camo githubusercontent com 6837ec50b4c5](https://user-images.githubusercontent.com/109401839/213219498-06b86aa6-a2ef-48cb-b653-069ca85c0b0e.jpg)
+    Expected result: the console prints a stream of "Creating user: <first>.<last>" lines.
 
-8. Log out/close the Remote Desktop connection to DC-1 and log back in as “mydomain.com\jane_admin"
-9. User jane_admin as your admin account from now on
+30. When it finishes, open ADUC and select `_EMPLOYEES`.
 
-<h2>Join Client-1 to your domain (mydomain.com)<h2>
+    Expected result: `_EMPLOYEES` is filled with User objects named like `<first>.<last>`.
 
-![vivaldi_cRAVrKouac](https://user-images.githubusercontent.com/109401839/213221204-72c7058c-3730-47d9-b9fb-4435ee87c3fd.png)
+31. Log in to Client-1 with one of the new accounts, using the password you set in the script.
 
-1. From the Azure Portal, set Client-1’s DNS settings to the DC’s Private IP address
-2. From the Azure Portal, restart Client-1
-3. Login to Client-1 (Remote Desktop) as the original local admin (labuser) and join it to the domain (computer will restart)
-4. Login to the Domain Controller (Remote Desktop) and verify Client-1 shows up in Active Directory Users and Computers (ADUC) inside the “Computers” container on the root of the domain
-5. Create a new OU named “_CLIENTS” and drag Client-1 into there
+## What I learned
 
-<H2>Setup Remote Desktop for non-administrative users on Client-1<H2>
+- A domain controller needs a static private IP, and domain clients need to use it as their DNS server before they can join the domain.
+- Windows Firewall blocks ICMP by default. Enabling the ICMPv4 echo rules is a quick way to confirm two VMs can reach each other.
+- OUs keep employees, admins, and computers organized, and adding a user to Domain Admins is what grants admin rights.
+- PowerShell can create thousands of AD accounts in minutes.
 
-1. Log into Client-1 as mydomain.com\jane_admin and open system properties
+## Next steps
 
-![vivaldi_pBr66s3R4C](https://user-images.githubusercontent.com/109401839/213220623-04e09574-52ad-407a-945b-f53f52417b50.png)
+- [Network File Shares and Permissions](https://github.com/aboutfaris/Network-File-Shares-and-Permissions): share folders from DC-1 and control access with groups.
+- [Building Intuition for DNS](https://github.com/aboutfaris/Building-Intuition-for-DNS): create DNS records on DC-1 and resolve them from Client-1.
 
-2. Click “Remote Desktop”
-3. Allow “domain users” access to remote desktop
-
-![Inkedvivaldi_uNcBpy336J](https://user-images.githubusercontent.com/109401839/213223500-193b62e3-062f-4f69-8da4-5ef96692ec31.jpg)
-
-
-4. You can now log into Client-1 as a normal, non-administrative user now
-5. Normally you’d want to do this with Group Policy that allows you to change MANY systems at once
-
-<H2>Create a bunch of additional users and attempt to log into client-1 with one of the users<H2>
-
-1. Login to DC-1 as jane_admin
-2. Open PowerShell_ise as an administrator
-3. Create a new File and paste the contents of the [script] below:
-
-
-> '''Function generate-random-name() {
->    $consonants = @('b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z')
->    $vowels = @('a','e','i','o','u','y')
->    $nameLength = Get-Random -Minimum 3 -Maximum 7
->    $count = 0
->    $name = ""
->
->    while ($count -lt $nameLength) {
->        if ($($count % 2) -eq 0) {
->            $name += $consonants[$(Get-Random -Minimum 0 -Maximum $($consonants.Count - 1))]
->        }
->        else {
->            $name += $vowels[$(Get-Random -Minimum 0 -Maximum $($vowels.Count - 1))]
->        }
->        $count++
->    }
->
->    return $name
->
-> }
->
-> $count = 1
-> while ($count -lt $NUMBER_OF_ACCOUNTS_TO_CREATE) {
->    $fisrtName = generate-random-name
->    $lastName = generate-random-name
->    $username = $fisrtName + '.' + $lastName
->    $password = ConvertTo-SecureString $PASSWORD_FOR_USERS -AsPlainText -Force
->
->    Write-Host "Creating user: $($username)" -BackgroundColor Black -ForegroundColor Cyan
->    
->    New-AdUser -AccountPassword $password `
->               -GivenName $firstName `
->               -Surname $lastName `
->               -DisplayName $username `
->               -Name $username `
->               -EmployeeID $username `
->               -PasswordNeverExpires $true `
->               -Path "ou=_EMPLOYEES,$(([ADSI]`"").distinguishedName)" `
->               -Enabled $true
->    $count++
-> }''' 
-
-[Code Source](https://github.com/joshmadakor1/AD_PS/blob/master/Generate-Names-Create-Users.ps1)
-
-4. Run the script and observe the accounts being created
-
-![vivaldi_Lr0ydPgSZ7](https://user-images.githubusercontent.com/109401839/213226346-7dc7f494-6299-4fab-a210-d07a16b71b97.png)
-
-
-5. When finished, open ADUC and observe the accounts in the appropriate OU
-6. Attempt to log into Client-1 with one of the accounts (take note of the password in the script)
-
-![vivaldi_hbfgkZ3l45](https://user-images.githubusercontent.com/109401839/213226577-6f5bd613-ba81-4a62-bc7c-98896e41c94a.png)
-
+Keep DC-1 and Client-1 running for those labs.
