@@ -1,73 +1,71 @@
-![image](https://user-images.githubusercontent.com/109401839/212763285-615193c5-a326-4fe5-8387-fa77727c3666.png)
-
 # Network File Shares and Permissions
 
-Welcome back! In this tutorial, we create folders in DC-1 from the previous tutorial.
+Create shared folders on the domain controller, give each one different share permissions, and test what a normal domain user can and cannot open from a client machine. Then use a security group to grant access to one share.
 
-<h2>Environments and Technologies Used</h2>
+## What you'll use
 
-- Microsoft Azure (Virtual Machines/Domain Controller/Client Machine)
+- Microsoft Azure (Virtual Machines: DC-1 domain controller, Client-1 client machine)
 - Remote Desktop
-- Shared Network Files
+- File Explorer sharing and Active Directory Users and Computers on DC-1
+- Windows 10 (21H2) on Client-1
 
-<h2>Operating Systems Used </h2>
+## Prerequisites
 
-- Windows 10 (21H2)
+- DC-1 and Client-1 from the Active Directory lab, with Client-1 joined to the domain and some domain users created: see [Configure on-premises Active Directory](https://github.com/aboutfaris/Configure-On-Premise-AD-Powershell-Script-Users)
 
-<h2>Actions and Observations</h2>
+## Steps
 
-Create some sample file shares with various permissions
+### Part 1: Create the folders
 
-1. Connect/log into DC-1 as your domain admin account (mydomain.com\jane_admin)
-2. Connect/log into Client-1 as a normal user (mydomain\<someuser>)
-3. On DC-1, on the C:\ drive, create 4 folders: “read-access”, “write-access”, “no-access”, “accounting”
+1. Log in to DC-1 as your domain admin account (`mydomain.com\jane_admin`).
+2. Log in to Client-1 as a normal domain user (`mydomain\<someuser>`).
+3. On DC-1, open File Explorer and create 4 folders on the C:\ drive: `read-access`, `write-access`, `no-access`, and `accounting`.
 
-![vivaldi_9PMyBqb1rk](https://user-images.githubusercontent.com/109401839/213238510-ac5e4b21-e1aa-4c55-a6bb-5896316fa34c.png)
+   Expected result: the 4 new folders appear in Windows (C:) next to Packages, Program Files, Users, Windows, and the other default folders.
 
+### Part 2: Share the folders
 
-4. Set the following permissions (share the folder) for the “Domain Users” group:
+4. For each folder, right-click it > Properties > Sharing tab > Share...
+5. In "Choose people on your network to share with", type the group name, click Add, set the Permission Level, then click Share:
+   - `read-access`: group `Domain Users`, permission `Read`
+   - `write-access`: group `Domain Users`, permission `Read/Write`
+   - `no-access`: group `Domain Admins`, permission `Read/Write`
+6. Skip `accounting` for now. You will share it in Part 4.
 
-![vivaldi_udC3XRiOew](https://user-images.githubusercontent.com/109401839/213168775-c3202790-fd5b-412a-9403-c2a34f312c38.png)
+   Expected result: before sharing, the Sharing tab shows the folder as "Not Shared". After sharing, Administrators stays as Owner and the group you added shows the permission you picked.
 
-5. Folder: “read-access”, Group: “Domain Users”, Permission: “Read”
-6. Folder: “write-access”, Group: “Domain Users”, Permissions: “Read/Write”
-7. Folder: “no-access”, Group: “Domain Admins”, “Permissions: “Read/Write"
+### Part 3: Test access as a normal user
 
-![vivaldi_HFyJKXmKru](https://user-images.githubusercontent.com/109401839/213238914-a7cf2107-1316-49ff-a143-aee24da4e0cc.png)
+7. On Client-1, open Start > Run and enter `\\dc-1`.
 
-8. **(Skip accounting for now)**
+   Expected result: File Explorer opens Network > dc-1 and lists NETLOGON, SYSVOL, `no-access`, `read-access`, and `write-access`. `accounting` is not listed yet because it is not shared.
 
-![2023-01-18 10 35 24 camo githubusercontent com bb1553347d44](https://user-images.githubusercontent.com/109401839/213239334-f81e1da5-d6ea-4dd7-a5b6-cc2dfd1d8825.jpg)
+8. Open each share and try to create a file in it. Note which folders you can open and which ones you can write to.
 
+   Expected result: opening `no-access` fails with "Windows cannot access \\dc-1\no-access. You do not have permission to access \\dc-1\no-access." Only Domain Admins have access to that share.
 
-**Attempt to access file shares as a normal user**
+### Part 4: Create an ACCOUNTANTS group and test access
 
-1. **On Client-1, navigate to the shared folder (start, run, \\dc-1)**
+9. On DC-1, open Active Directory Users and Computers. Right-click `mydomain.com` > New > Organizational Unit and name it `_SECURITY_GROUPS`.
+10. Inside `_SECURITY_GROUPS`, create a security group named `ACCOUNTANTS`.
 
-![vivaldi_2EJQr6eI7x](https://user-images.githubusercontent.com/109401839/213240066-cc5d8dbe-03fa-4c49-9b61-a26f385f6d18.png)
+    Expected result: `_SECURITY_GROUPS` sits next to `_ADMINS` and `_EMPLOYEES`, and contains ACCOUNTANTS with type Security Group.
 
-2. **Try to access the folders you just created. Which folders can you access? Which folders can you create stuff in?**
+11. Share the `accounting` folder (Properties > Sharing > Share...) with group `ACCOUNTANTS`, permission `Read/Write`, then click Share.
 
-![vivaldi_mKtfJuMugZ](https://user-images.githubusercontent.com/109401839/213240171-a71b0990-f0e4-47e4-b29d-a1cf75d6b107.png)
+    Expected result: the share list shows ACCOUNTANTS as Read/Write and the admin account as Owner.
 
+12. On Client-1, as `<someuser>`, try to open `\\dc-1\accounting`. It should fail, because `<someuser>` is not in ACCOUNTANTS yet.
+13. Log out of Client-1.
+14. On DC-1, add `<someuser>` as a member of the ACCOUNTANTS security group.
+15. Sign back in to Client-1 as `<someuser>` and open `\\dc-1\accounting` again. Signing out and back in is what lets Client-1 pick up the new group membership.
 
-**Create an “ACCOUNTANTS” Security Group, assign permissions, an test access**
+## What I learned
 
-1. **Go back to DC-1, in Active Directory, create a security group called “ACCOUNTANTS”**
+- Share permissions control who can reach a folder over the network, and they can be set per group instead of per user.
+- A user who is not in the allowed group gets a "You do not have permission" network error.
+- Granting access through a security group means adding or removing a user from the group is all it takes to change their access, but the user has to sign out and back in for it to apply.
 
-![vivaldi_21iy1mXf9Y](https://user-images.githubusercontent.com/109401839/213240836-dc93efd1-db6d-4a5f-b073-8107f9059209.png)
+## Next steps
 
-![vivaldi_l2gDyFcQNi](https://user-images.githubusercontent.com/109401839/213241010-c6724461-224c-4ea2-91af-5e36ed9b63c4.png)
-
-
-2. **On the “accounting” folder you created earlier, set the following permissions:**
-3. **Folder: “accounting”, Group: “ACCOUNTANTS”, Permissions: “Read/Write”**
-
-![vivaldi_SeDK46vClF](https://user-images.githubusercontent.com/109401839/213241173-107c6264-0c34-463e-ae23-b4bd816b7dad.png)
-
-4. **On Client-1, as <someuser>, try to access the accountants folder. It should fail.**
-5. **Log out of Client-1 as <someuser>**
-6. **On DC-1, make <someuser> a member of the “ACCOUNTANTS” Security Group**
-7. **Sign back into Client-1 as <someuser> and try to access the “accounting” share in \\DC-1\**
-
-In the [next tutorial](https://github.com/aboutfaris/Building-Intuition-for-DNS), we go over setting up DNS. You may keep the virtual machine from this lab and continue with the next tutorial.
+In the [next tutorial](https://github.com/aboutfaris/Building-Intuition-for-DNS), we set up DNS records. You can keep the virtual machines from this lab and continue there.
