@@ -1,76 +1,88 @@
-![image](https://user-images.githubusercontent.com/109401839/212763428-5ec473e9-9048-4cc0-bf1b-0133ac4db278.png)
-
 # Building Intuition for DNS
 
-Welcome back! In this tutorial, we build a solid fundamental understanding of DNS.
+Create A and CNAME records on an Active Directory domain controller and watch how a domain client resolves them, including what the local DNS cache does when a record changes.
 
-<h2>Environments and Technologies Used</h2>
+DNS (Domain Name System) is the phonebook of the internet: it turns readable names like `www.google.com` into the numeric IP addresses computers use. Asking a voice assistant to "call the nearest pharmacy" works the same way: it looks up the name, finds the number, and connects you.
+
+## What you'll use
 
 - Microsoft Azure (Virtual Machines/Compute)
 - Remote Desktop
-- DNS
+- DNS Manager on Windows Server (DC-1)
+- Command Prompt on Windows 10 (21H2) (Client-1)
 
-<h2>Operating Systems Used </h2>
+## Prerequisites
 
-- Windows 10 (21H2)
+- Active Directory installed on DC-1, with Client-1 joined to the domain: see [Configure on-premises Active Directory](https://github.com/aboutfaris/Configure-On-Premise-AD-Powershell-Script-Users)
+- DC-1 has a static private IP, and Client-1 uses DC-1's private IP as its DNS server. Both VMs are in the same Azure virtual network.
 
-<h2>List of Prerequisites</h2>
+## Steps
 
-- Active Directory Installed
-- Client and Domain Controller Connected
+### Part 1: A record
 
-![cloudflare-1111](https://user-images.githubusercontent.com/109401839/213241753-8772baf2-c4fd-4721-827b-c86fb18ae13c.gif)
+1. Log in to DC-1 as your domain admin account (`mydomain.com\jane_admin`).
+2. Log in to Client-1 as the same admin (`mydomain\jane_admin`).
+3. On Client-1, open Command Prompt and try to reach a host that does not exist yet:
 
-What is DNS? The Domain Name System (DNS) is the phonebook of the internet. It converts numeric IP addresses (like `8.8.8.8`) into readable addresses (like `www.google.com`). Imagine asking your phone's voice assistant to "call the nearest pharmacy": the assistant finds the address, resolves it to a number, and connects the call. DNS does the same thing for websites.
+   ```cmd
+   ping mainframe
+   nslookup mainframe
+   ```
 
-<h2>Actions and Observations</h2>
-**A-Record Exercise**
+   Expected result: ping reports "Ping request could not find host mainframe", and `nslookup` finds no record.
 
-![vivaldi_te0ncrjmC3](https://user-images.githubusercontent.com/109401839/213228476-10566ab6-eff5-467e-a836-76b21cc14b09.png)
+4. On DC-1, open Server Manager > Tools > DNS.
+5. Expand DC-1 > Forward Lookup Zones > mydomain.com.
 
-1. Connect/log into DC-1 as your domain admin account (`mydomain.com\jane_admin`)
-2. Connect/log into Client-1 as an admin (`mydomain\jane_admin`)
-3. From Client-1, try to ping "mainframe" and notice that it fails
-4. Run `nslookup mainframe` and notice that it fails (no DNS record)
-5. Create a DNS A record on DC-1 for "mainframe" pointing to DC-1's private IP address
+   Expected result: the zone already holds SOA and NS records plus Host (A) records for dc-1 and Client-1.
 
-Double-check your spelling. The first time I did this, I misspelled "mainframe" as "mainfame" and couldn't figure out why it wasn't working. Lesson learned.
+6. Right-click mydomain.com > New Host (A or AAAA). Enter the name `mainframe` and DC-1's private IP address, then click Add Host. Double-check the spelling: a typo such as "mainfame" is an easy way to lose an hour.
+7. On Client-1, run `ping mainframe` again.
 
-![2023-01-18 10 12 45 coursecareers com ef528124c90b](https://user-images.githubusercontent.com/109401839/213230206-6f8bb790-3ed4-4a81-b431-d84fd177b8b1.jpg)
+   Expected result: Client-1 pings `mainframe.mydomain.com` at DC-1's private IP with 4 replies and 0% loss.
 
+### Part 2: Local DNS cache
 
-Open DNS Manager via Server Manager, go to Forward Lookup Zones > your domain, and manually create an A record with DC-1's IP address.
+8. On DC-1, double-click the `mainframe` record, change its IP address to `8.8.8.8`, and click OK.
+9. On Client-1, run `ping mainframe`.
 
-6. Go back to Client-1 and try to ping it. Observe that it now works.
+   Expected result: it still replies from DC-1's old private IP, because Client-1 cached the earlier answer.
 
-![vivaldi_aRBUA6joTQ](https://user-images.githubusercontent.com/109401839/213231056-fb8de6ee-e1ca-4eba-8097-25dcf4268f60.png)
+10. View the cache:
 
-### Local DNS Cache Exercise
+    ```cmd
+    ipconfig /displaydns
+    ```
 
-1. Go back to DC-1 and change "mainframe"'s record address to `8.8.8.8`.
+11. Open Command Prompt as administrator and flush the cache:
 
-   ![vivaldi_kCL8ATV9xe](https://user-images.githubusercontent.com/109401839/213231797-93173e4c-eb96-4b2b-902e-090c37d38f2f.png)
+    ```cmd
+    ipconfig /flushdns
+    ```
 
-2. Go back to Client-1 and ping "mainframe" again. Observe that it still pings the old address, because the old record still exists in the client's local DNS cache.
+    Expected result: "Successfully flushed the DNS Resolver Cache."
 
-   ![vivaldi_b8guefs1IO](https://user-images.githubusercontent.com/109401839/213232169-7cbd4961-08e0-409c-acfb-bdb2c0c3904a.png)
+12. Run `ping mainframe` again.
 
-3. Observe the local DNS cache with `ipconfig /displaydns`.
-4. Flush the DNS cache with `ipconfig /flushdns`. Observe that the cache is now empty.
+    Expected result: `mainframe.mydomain.com` now resolves to `8.8.8.8` and gets 4 replies.
 
-   ![vivaldi_ngpZOpAny4](https://user-images.githubusercontent.com/109401839/213232520-8c9a7a92-b407-4b4f-89b7-844e25ff2e50.png)
+### Part 3: CNAME record
 
-5. Ping "mainframe" again. Observe that the new record's address now shows up.
+A CNAME (alias) record points one name at another name instead of at an IP address.
 
-   ![vivaldi_mM61VFUhCE](https://user-images.githubusercontent.com/109401839/213232855-48f2d665-3370-4e88-a168-801d029033c9.png)
+13. On DC-1, right-click mydomain.com > New Alias (CNAME). Set Alias name to `search` and the target host FQDN to `www.google.com`, then click OK.
+14. On Client-1, run `ping search`.
 
-### CNAME Record Exercise
+    Expected result: the ping goes to `www.google.com` and its public IP, with 4 replies.
 
-![CNAME record diagram](https://user-images.githubusercontent.com/109401839/213233343-f7ff8421-db7d-4a62-a074-58e607ccada8.jpg)
+15. Run `nslookup search` and look at how the alias resolves to `www.google.com`.
 
-1. Go back to DC-1 and create a CNAME record that points the host "search" to "www.google.com".
-2. Go back to Client-1 and attempt to ping "search". Observe the results of the CNAME record.
+## What I learned
 
-   ![vivaldi_8fNzswyh0V](https://user-images.githubusercontent.com/109401839/213233611-e5ed9231-42db-4b85-95d1-3f28f166416f.png)
+- An A record maps a name to an IP; a CNAME maps a name to another name.
+- Clients cache DNS answers, so a changed record does not take effect until the cache expires or you run `ipconfig /flushdns`.
+- `ping` and `nslookup` are quick ways to confirm what a name resolves to.
 
-3. On Client-1, run `nslookup search` and observe the results of the CNAME record.
+## Next steps / cleanup
+
+- Delete the `mainframe` and `search` records when you finish, or stop the VMs to avoid charges.
