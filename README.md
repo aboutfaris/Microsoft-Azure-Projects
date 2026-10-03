@@ -2,9 +2,9 @@
 <img src="https://i.imgur.com/pU5A58S.png" alt="Microsoft Active Directory Logo"/>
 </p>
 
-<h1>On-premises Active Directory Deployed in the Cloud (Azure)</h1>
+# On-Premises Active Directory Deployed in the Cloud (Azure)
 
-Welcome back! This tutorial outlines the implementation of on-premises Active Directory within Azure Virtual Machines.<br />
+Welcome back! This tutorial outlines the implementation of on-premises Active Directory within Azure Virtual Machines.
 
 <h2>Environments and Technologies Used</h2>
 
@@ -96,7 +96,7 @@ Look at that beautiful traffic. Now its time to ...
 
 ![vivaldi_JXNeaUMVFe](https://user-images.githubusercontent.com/109401839/213218280-33c7fe97-751c-4ba8-8900-dd90821fc579.png)
 
-6. Create a new employee named “Jane Doe” (same password) with the username of “jane_admin”
+6. Create a new employee named "Jane Doe" (same password) with the username "jane_admin"
 7. Add jane_admin to the “Domain Admins” Security Group
 
 ![2023-01-18 09 46 52 camo githubusercontent com 6837ec50b4c5](https://user-images.githubusercontent.com/109401839/213219498-06b86aa6-a2ef-48cb-b653-069ca85c0b0e.jpg)
