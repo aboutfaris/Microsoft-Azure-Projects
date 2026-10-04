@@ -13,7 +13,7 @@ DNS (Domain Name System) is the phonebook of the internet: it turns readable nam
 
 ## Prerequisites
 
-- Active Directory installed on DC-1, with Client-1 joined to the domain: see [Configure on-premises Active Directory](https://github.com/aboutfaris/Configure-On-Premise-AD-Powershell-Script-Users)
+- Active Directory installed on DC-1, with Client-1 joined to the domain: see [Configuring On-premises Active Directory within Azure VMs](../01-active-directory-in-azure-vms/)
 - DC-1 has a static private IP, and Client-1 uses DC-1's private IP as its DNS server. Both VMs are in the same Azure virtual network.
 
 ## Steps

@@ -1,4 +1,4 @@
-# On-Premises Active Directory Deployed in the Cloud (Azure)
+# Configuring On-premises Active Directory within Azure VMs
 
 Build a small Active Directory lab in Azure: a Windows Server domain controller (DC-1), a Windows 10 client (Client-1) joined to the domain, and a batch of test users created with a PowerShell script.
 
@@ -159,7 +159,7 @@ Build a small Active Directory lab in Azure: a Windows Server domain controller 
 
 ## Next steps
 
-- [Network File Shares and Permissions](https://github.com/aboutfaris/Network-File-Shares-and-Permissions): share folders from DC-1 and control access with groups.
-- [Building Intuition for DNS](https://github.com/aboutfaris/Building-Intuition-for-DNS): create DNS records on DC-1 and resolve them from Client-1.
+- [Network File Shares and Permissions](../03-network-file-shares-and-permissions/): share folders from DC-1 and control access with groups.
+- [Building Intuition for DNS](../04-building-intuition-for-dns/): create DNS records on DC-1 and resolve them from Client-1.
 
 Keep DC-1 and Client-1 running for those labs.

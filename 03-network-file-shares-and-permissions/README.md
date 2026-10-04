@@ -11,7 +11,7 @@ Create shared folders on the domain controller, give each one different share pe
 
 ## Prerequisites
 
-- DC-1 and Client-1 from the Active Directory lab, with Client-1 joined to the domain and some domain users created: see [Configure on-premises Active Directory](https://github.com/aboutfaris/Configure-On-Premise-AD-Powershell-Script-Users)
+- DC-1 and Client-1 from the Active Directory lab, with Client-1 joined to the domain and some domain users created: see [Configuring On-premises Active Directory within Azure VMs](../01-active-directory-in-azure-vms/)
 
 ## Steps
 
@@ -68,4 +68,4 @@ Create shared folders on the domain controller, give each one different share pe
 
 ## Next steps
 
-In the [next tutorial](https://github.com/aboutfaris/Building-Intuition-for-DNS), we set up DNS records. You can keep the virtual machines from this lab and continue there.
+In the [next tutorial](../04-building-intuition-for-dns/), we set up DNS records. You can keep the virtual machines from this lab and continue there.
