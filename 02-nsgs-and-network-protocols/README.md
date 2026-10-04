@@ -1,4 +1,4 @@
-# Network Security Groups and Inspecting Traffic Between Azure VMs
+# Network Security Groups (NSGs) and Inspecting Network Protocols
 
 Capture and read ICMP, SSH, DHCP, DNS, and RDP traffic between two Azure virtual machines with Wireshark. Each VM sits behind its own network security group (NSG), and the Windows VM watches the traffic it sends to and receives from the Linux VM.
 
