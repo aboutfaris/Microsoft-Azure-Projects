@@ -18,3 +18,7 @@ The diagram shows how the four labs fit together: the shared DC-1 and Client-1 d
 ## How to use
 
 Start with section 01. Sections 03 and 04 reuse its DC-1 and Client-1 VMs, so keep them running until you finish those labs. Section 02 stands on its own. Delete the Azure resource group when you're done to stop charges.
+
+## License
+
+Code and scripts in this repository are licensed under the MIT License (see [LICENSE](LICENSE)). Written guides and diagrams are licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Third-party material keeps its original license and is excluded from both.
