@@ -94,7 +94,7 @@
 <text x="40" y="890" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#232F3E" text-anchor="start">How it works</text>
 <rect x="40" y="912" width="24" height="24" rx="3" fill="#146EB4"/>
 <text x="52" y="928.6" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#FFFFFF" text-anchor="middle">1</text>
-<text x="74" y="928.6" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.5" font-weight="400" fill="#232F3E" text-anchor="start">You reach every lab VM from your own computer over Remote Desktop.</text>
+<text x="74" y="928.6" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.5" font-weight="400" fill="#232F3E" text-anchor="start">02: you connect from your own computer to the Windows 10 VM over Remote Desktop.</text>
 <rect x="40" y="944" width="24" height="24" rx="3" fill="#146EB4"/>
 <text x="52" y="960.6" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#FFFFFF" text-anchor="middle">2</text>
 <text x="74" y="960.6" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.5" font-weight="400" fill="#232F3E" text-anchor="start">01: DC-1 runs AD DS with a static private IP; Client-1 uses it for DNS and joins the domain.</text>

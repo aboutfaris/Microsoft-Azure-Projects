@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 """Microsoft Azure Set: high-level lab architecture diagram.
 
-Built from the 340 architecture diagram reference implementation
-(.kiro/steering/aws-architecture-diagram-style.md), with these owner-approved deviations
-for this portfolio repo: no company branding or footer, Azure icons only (official Azure
-icons bundled in the `diagrams` package), and one Microsoft Azure boundary.
+Uses Azure icons only (official Azure icons bundled in the `diagrams` package) and one
+Microsoft Azure boundary.
 
-Set up once:  python3 -m venv /tmp/c340_diag_venv
-              /tmp/c340_diag_venv/bin/pip install diagrams     (official icons)
+Set up once:  python3 -m venv /tmp/diagram_venv
+              /tmp/diagram_venv/bin/pip install diagrams       (official icons)
               brew install librsvg                              (rsvg-convert)
-Run:          /tmp/c340_diag_venv/bin/python architecture_diagram.py <out-prefix>
+Run:          /tmp/diagram_venv/bin/python architecture_diagram.py <out-prefix>
 It writes <out-prefix>.svg and <out-prefix>.png (rendered at 2x). The checks must print
 "layout problems: none".
 """
@@ -235,7 +233,7 @@ for cx, cy, n in [(158, 228, 1), (SL[1][1], 282, 2), (1280, 340, 3), (SL[0][1], 
 # ---------------- EDIT: legend steps, one short sentence each, same order as the badges ----------------
 LY = 890
 STEPS = [
-    "You reach every lab VM from your own computer over Remote Desktop.",
+    "02: you connect from your own computer to the Windows 10 VM over Remote Desktop.",
     "01: DC-1 runs AD DS with a static private IP; Client-1 uses it for DNS and joins the domain.",
     "01, Part 7: a PowerShell script on DC-1 bulk-creates domain users in the _EMPLOYEES OU.",
     "02: Wireshark on the Windows VM captures ICMP, SSH, DHCP, DNS, and RDP; an NSG guards each VM.",
