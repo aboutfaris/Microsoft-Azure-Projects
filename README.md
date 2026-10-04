@@ -2,6 +2,11 @@
 
 Hands-on Azure labs that build a small Windows domain in the cloud, then use it to explore network traffic, file share permissions, and DNS. Each section is a step-by-step follow-along guide.
 
+![Microsoft Azure architecture](assets/architecture.png)
+
+The diagram shows how the four labs fit together: the shared DC-1 and Client-1 domain used by sections 01, 03, and 04, and the standalone two-VM traffic lab in section 02.
+
+
 | Section | What you'll build | Folder |
 | --- | --- | --- |
 | Configuring On-premises Active Directory within Azure VMs | A Windows Server domain controller (DC-1) and a domain-joined Windows 10 client (Client-1) in Azure | [01-active-directory-in-azure-vms](./01-active-directory-in-azure-vms/) |
