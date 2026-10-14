@@ -2,6 +2,10 @@
 
 Build a small Active Directory lab in Azure: a Windows Server domain controller (DC-1), a Windows 10 client (Client-1) joined to the domain, and a batch of test users created with a PowerShell script.
 
+![Active Directory in Azure VMs architecture](assets/architecture.png)
+
+The diagram shows DC-1 and Client-1 in one Azure virtual network, the domain join, and the Part 7 PowerShell script that bulk-creates users.
+
 ## What you'll use
 
 - Microsoft Azure (Virtual Machines/Compute)
