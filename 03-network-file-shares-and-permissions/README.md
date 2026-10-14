@@ -2,6 +2,10 @@
 
 Create shared folders on the domain controller, give each one different share permissions, and test what a normal domain user can and cannot open from a client machine. Then use a security group to grant access to one share.
 
+![Network file shares and permissions architecture](assets/architecture.png)
+
+The diagram shows the four shares on DC-1, the group that holds each share permission, and what Client-1 can open, using the DC-1 and Client-1 domain from section 01.
+
 ## What you'll use
 
 - Microsoft Azure (Virtual Machines: DC-1 domain controller, Client-1 client machine)
