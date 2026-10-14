@@ -220,7 +220,7 @@ link("ps", "t", "users", "b")
 # ---------------- EDIT: line labels (white halo keeps them readable over lines) ----------------
 text(280, A1 - 9, "RDP", 11.5, 400, TEXT2, "middle", halo=True)
 text(700, GY + 17, "RDP", 11.5, 400, TEXT2, "middle", halo=True)
-text(GX1, A1 - 9, "ping, DNS, domain join", 11.5, 400, TEXT2, "middle", halo=True)
+text(693, A1 - 9, "ping, DNS, join", 11.5, 400, TEXT2, "middle", halo=True)
 text(SL[0][1] + 10, 347, "Remote Desktop rights", 11.5, 400, TEXT2, "start", halo=True)
 text(1052, A1 - 9, "ADUC", 11.5, 400, TEXT2, "middle", halo=True)
 text(SL[2][1], B1 - 9, "runs", 11.5, 400, TEXT2, "middle", halo=True)

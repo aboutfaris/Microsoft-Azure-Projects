@@ -35,6 +35,9 @@ KINDS = {  # stroke, width, dash, arrowhead marker, legend label
 
 # stroke-only outline glyphs (52 px box, #3F4752 stroke, no fill) for parts with no official icon
 GLYPHS = {
+    "cache": ('<rect x="5" y="7" width="38" height="9"/><rect x="5" y="20" width="24" height="9"/>'
+              '<rect x="5" y="33" width="20" height="9"/><circle cx="38" cy="37" r="9"/>'
+              '<path d="M38,32 V37 H42"/>'),
     "folder": '<path d="M5,13 H20 L24,18 H47 V43 H5 Z"/><path d="M5,22 H47"/>',
     "group": ('<circle cx="19" cy="17" r="7"/>'
               '<path d="M6,43 V38 C6,31 11,27 19,27 C27,27 32,31 32,38 V43 Z"/>'
@@ -195,7 +198,7 @@ VMW = "azure/compute/vm-windows.png"
 
 # Client-1
 node("client1", VMW, SL[0][1], A1, "Client-1", "runs ping and nslookup")
-node("cache", "azure/general/cache.png", SL[0][1], B1, "Local DNS cache",
+node("cache", "glyph:cache", SL[0][1], B1, "Local DNS cache",
      "ipconfig /displaydns, /flushdns")
 
 # DC-1 DNS server
