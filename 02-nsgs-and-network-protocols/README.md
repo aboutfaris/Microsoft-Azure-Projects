@@ -2,6 +2,10 @@
 
 Capture and read ICMP, SSH, DHCP, DNS, and RDP traffic between two Azure virtual machines with Wireshark. Each VM sits behind its own network security group (NSG), and the Windows VM watches the traffic it sends to and receives from the Linux VM.
 
+![NSGs and network protocols architecture](assets/architecture.png)
+
+The diagram shows the standalone two-VM lab: each VM behind its own NSG, and the ICMP, SSH, DHCP, DNS, and RDP traffic Wireshark captures.
+
 ## What you'll use
 
 - Microsoft Azure (Virtual Machines/Compute) with network security groups

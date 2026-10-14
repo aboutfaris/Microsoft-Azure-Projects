@@ -2,6 +2,10 @@
 
 Create A and CNAME records on an Active Directory domain controller and watch how a domain client resolves them, including what the local DNS cache does when a record changes.
 
+![Building intuition for DNS architecture](assets/architecture.png)
+
+The diagram shows Client-1 querying DNS on DC-1, the A and CNAME records in the lab zone, and the local DNS cache, using the DC-1 and Client-1 domain from section 01.
+
 DNS (Domain Name System) is the phonebook of the internet: it turns readable names like `www.google.com` into the numeric IP addresses computers use. Asking a voice assistant to "call the nearest pharmacy" works the same way: it looks up the name, finds the number, and connects you.
 
 ## What you'll use
